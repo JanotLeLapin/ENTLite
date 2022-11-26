@@ -1,5 +1,5 @@
 use crate::URL;
-use reqwest::{Client,Error};
+use reqwest::{blocking::Client, Error};
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
@@ -16,10 +16,27 @@ pub struct Userbook {
     pub theme: String,
 }
 
-pub async fn fetch_userbook(client: &Client, id: &str) -> Result<Userbook, Error> {
-    let res = client.get(format!("{}/directory/userbook/{}", URL, id))
-        .send().await?
-        .json().await?;
+#[derive(Deserialize, Debug)]
+pub struct Userinfo {
+    #[serde(rename(serialize = "userId", deserialize = "userId"))]
+    pub id: String,
+    pub level: String,
+    #[serde(rename(serialize = "lastName", deserialize = "lastName"))]
+    pub last_name: String,
+    #[serde(rename(serialize = "firstName", deserialize = "firstName"))]
+    pub first_name: String,
+}
 
-    Ok(Userbook::from(res))
+pub fn fetch_userbook(client: &Client, id: &str) -> Result<Userbook, Error> {
+    Ok(client.get(format!("{}/directory/userbook/{}", URL, id))
+        .send()?
+        .json()?
+    )
+}
+
+pub fn fetch_userinfo(client: &Client) -> Result<Userinfo, Error> {
+    Ok(client.get(format!("{}/auth/oauth2/userinfo", URL))
+        .send()?
+        .json()?
+    )
 }
