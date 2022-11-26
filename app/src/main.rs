@@ -58,20 +58,36 @@ fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Percentage(10),
+            Constraint::Percentage(20),
             Constraint::Percentage(80),
-            Constraint::Percentage(10),
         ])
         .split(size);
-    let block = Block::default()
+
+    let top = Block::default()
         .title("ENTLite")
         .borders(Borders::ALL);
 
+    let bottom = Block::default()
+        .title("Messages")
+        .borders(Borders::ALL);
+
     let user = api::user::fetch_userinfo(&app.client).unwrap();
+    let unread_count = api::message::fetch_count(&app.client, true).unwrap();
 
-    let header = vec![Spans::from(format!("Welcome {}", user.first_name))];
+    let mut header = vec![Spans::from(format!("Welcome {}", user.first_name))];
+    if unread_count > 0 {
+        header.push(Spans::from(format!("You have {} unread messages.", unread_count)));
+    }
 
-    let paragraph = Paragraph::new(header).block(block);
+    let messages: Vec<Spans> = api::message::fetch_messages(&app.client, "/Inbox", 0, false)
+        .unwrap()
+        .iter()
+        .map(|msg| {
+            let author = api::user::fetch_person(&app.client, &msg.from).unwrap();
+            Spans::from(format!("{}: {}", author.display_name, msg.subject))
+        })
+        .collect();
 
-    f.render_widget(paragraph, chunks[0]);
+    f.render_widget(Paragraph::new(header).block(top), chunks[0]);
+    f.render_widget(Paragraph::new(messages).block(bottom), chunks[1]);
 }
