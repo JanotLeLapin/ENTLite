@@ -3,7 +3,8 @@ use tui::{
     backend::{Backend, CrosstermBackend},
     layout::{Constraint, Direction, Layout},
     widgets::{Block, Borders, Paragraph},
-    text::Spans,
+    style::{Style, Color},
+    text::{Span, Spans},
     Frame,
     Terminal,
 };
@@ -14,7 +15,10 @@ use crossterm::{
 };
 
 struct App {
-    client: reqwest::blocking::Client,
+    me: api::user::Userinfo,
+    messages: Vec<(api::message::Message, api::user::Person)>,
+    unread_count: u64,
+    selected_message: Option<usize>,
 }
 
 fn main() {
@@ -31,8 +35,17 @@ fn main() {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend).unwrap();
 
-    app(&mut terminal, &App {
-        client,
+    app(&mut terminal, App {
+        me: api::user::fetch_userinfo(&client).unwrap(),
+        messages: api::message::fetch_messages(&client, "/Inbox", 0, false)
+            .unwrap()
+            .into_iter()
+            .map(|msg| {
+                let author = api::user::fetch_person(&client, &msg.from).unwrap();
+                (msg, author)
+            }).collect(),
+        unread_count: api::message::fetch_count(&client, true).unwrap(),
+        selected_message: Option::None,
     });
 
     disable_raw_mode().unwrap();
@@ -40,13 +53,19 @@ fn main() {
     terminal.show_cursor().unwrap();
 }
 
-fn app<B: Backend>(terminal: &mut Terminal<B>, app: &App) {
+fn app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) {
     loop {
-        terminal.draw(|f| ui(f, app)).unwrap();
+        terminal.draw(|f| ui(f, &app)).unwrap();
 
         if let Event::Key(key) = event::read().unwrap() {
             match key.code {
                 KeyCode::Char('q') => return,
+                KeyCode::Up => {
+                    app.selected_message = Some(app.selected_message.map_or(0, |x| std::cmp::max(x - 1, 0)))
+                }
+                KeyCode::Down => {
+                    app.selected_message = Some(app.selected_message.map_or(1, |x| std::cmp::max(x + 1, 0)))
+                }
                 _ => {},
             }
         }
@@ -71,20 +90,27 @@ fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
         .title("Messages")
         .borders(Borders::ALL);
 
-    let user = api::user::fetch_userinfo(&app.client).unwrap();
-    let unread_count = api::message::fetch_count(&app.client, true).unwrap();
-
-    let mut header = vec![Spans::from(format!("Welcome {}", user.first_name))];
-    if unread_count > 0 {
-        header.push(Spans::from(format!("You have {} unread messages.", unread_count)));
+    let mut header = vec![Spans::from(format!("Welcome {}", app.me.first_name))];
+    if app.unread_count > 0 {
+        header.push(Spans::from(format!("You have {} unread messages.", app.unread_count)));
     }
 
-    let messages: Vec<Spans> = api::message::fetch_messages(&app.client, "/Inbox", 0, false)
-        .unwrap()
+    let hovered_style = Style::default()
+        .fg(Color::Black)
+        .bg(Color::White);
+
+    let messages: Vec<Spans> = app.messages
         .iter()
-        .map(|msg| {
-            let author = api::user::fetch_person(&app.client, &msg.from).unwrap();
-            Spans::from(format!("{}: {}", author.display_name, msg.subject))
+        .enumerate()
+        .map(|(i, msg)| {
+            let (msg, user) = msg;
+            let span = Spans::from(
+                Span::styled(
+                    format!("{}: {}", user.display_name, msg.subject),
+                    if i == app.selected_message.unwrap_or(0) { hovered_style } else { Style::default() }
+                )
+            );
+            span
         })
         .collect();
 
