@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
+
+
   let username = ''
   let password = ''
 
@@ -13,9 +16,14 @@
         'content-type': 'application/json',
       },
     });
+    goto('/');
+  }
+
+  const keypress = (k: KeyboardEvent) => {
+    if (k.key === 'Enter') login();
   }
 </script>
 
-<input type="text" bind:value={username} />
-<input type="password" bind:value={password} />
+<input type="text" bind:value={username} on:keypress={keypress} />
+<input type="password" bind:value={password} on:keypress={keypress}  />
 <button on:click={login}>Se connecter</button>

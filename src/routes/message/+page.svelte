@@ -1,12 +1,9 @@
 <script lang="ts">
-	import Header from "../../components/Header.svelte";
   import type { PageData } from "./$types";
 
   export let data: PageData;
-  console.log(data);
 </script>
 
-<Header />
 <div class="px-24 py-8 space-y-4">
   {#each data.messages as msg}
     <div class="border border-slate-200 rounded-md p-4">
