@@ -25,7 +25,7 @@
   </div>
   <div class="space-x-4">
     {#if loggedIn}
-      <p>{user?.firstName}</p>
+      <p>{user?.firstName} {user?.lastName}</p>
     {:else}
       <a href="/auth">Connexion</a>
     {/if}
