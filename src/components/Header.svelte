@@ -12,7 +12,7 @@
   <div class="flex items-center">
     <a href="/"><h3 class="text-3xl font-bold cursor-pointer">ENTLite</h3></a>
     <ul class="ml-16 space-x-8">
-      <li>Messages <span class="text-slate-100 text-xs bg-indigo-500 font-medium rounded-full ml-2 px-1.5 py-0.5">{unread}</span></li>
+      <a href="/message"><li>Messages <span class="text-slate-100 text-xs bg-indigo-500 font-medium rounded-full ml-2 px-1.5 py-0.5">{unread}</span></li></a>
     </ul>
   </div>
   <div class="space-x-4">

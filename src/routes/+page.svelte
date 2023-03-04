@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Header from "../components/Header.svelte";
-	import type { PageServerData } from "./$types";
+	import type { PageData } from "./$types";
 
-	export let data: PageServerData;
+	export let data: PageData;
 </script>
 
 <Header />

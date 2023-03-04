@@ -16,14 +16,15 @@ export const apiEndpoint = (method: string, req: (r: RequestEvent) => ApiRequest
     
     const cookie = request.request.headers.get('cookie') as string;
     const xsrf = cookie.split('XSRF-TOKEN=')[1].split(';')[0];
-    const json = await fetch(r.url, {
+    const res = await fetch(r.url, {
       method,
       headers: {
         'Cookie': cookie,
         'X-XSRF-TOKEN': xsrf,
       },
       body: r.body,
-    }).then(res => res.json());
+    });
+    const json = await res.json();
     return new Response(JSON.stringify(json));
   })
 }
