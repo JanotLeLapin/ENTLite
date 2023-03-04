@@ -1,21 +1,28 @@
-import type { Cookies, RequestHandler } from '@sveltejs/kit';
+import type { Cookies, RequestEvent, RequestHandler } from '@sveltejs/kit';
 
 export type FetchAuth = {
   cookie: Cookies,
   fetch: typeof fetch,
 }
 
-export const apiEndpoint = (url: string, method: string, body?: (r: Request) => any): RequestHandler => {
-  return (async ({ request, fetch }) => {
-    const cookie = request.headers.get('cookie') as string;
+export type ApiRequest = {
+  url: string,
+  body?: any,
+}
+
+export const apiEndpoint = (method: string, req: (r: RequestEvent) => ApiRequest): RequestHandler => {
+  return (async (request) => {
+    const r = req(request);
+    
+    const cookie = request.request.headers.get('cookie') as string;
     const xsrf = cookie.split('XSRF-TOKEN=')[1].split(';')[0];
-    const json = await fetch(url, {
+    const json = await fetch(r.url, {
       method,
       headers: {
         'Cookie': cookie,
         'X-XSRF-TOKEN': xsrf,
       },
-      body: body ? body(request) : undefined,
+      body: r.body,
     }).then(res => res.json());
     return new Response(JSON.stringify(json));
   })
