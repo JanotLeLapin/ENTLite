@@ -24,7 +24,13 @@ export const apiEndpoint = (method: string, req: (r: RequestEvent) => ApiRequest
       },
       body: r.body,
     });
-    const json = await res.json();
-    return new Response(JSON.stringify(json));
+    try {
+      const json = await res.json();
+      return new Response(JSON.stringify(json));
+    } catch (err) {
+      return new Response(null, {
+        status: 401,
+      });
+    }
   })
 }

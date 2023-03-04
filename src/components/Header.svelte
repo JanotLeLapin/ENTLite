@@ -1,10 +1,18 @@
 <script lang="ts">
 	import { unreadCount } from '$lib/message';
+	import type { UserInfo } from '$lib/user';
 	import { onMount } from 'svelte';
+
+  export let user: UserInfo;
+
+  let loggedIn = false;
 
   let unread = 0;
   onMount(async () => {
-    unread = await unreadCount();
+    unreadCount().then(res => {
+      unread = res;
+      loggedIn = true;
+    }).catch(console.error);
   })
 </script>
 
@@ -16,7 +24,11 @@
     </ul>
   </div>
   <div class="space-x-4">
-    <a href="/auth">Connexion</a>
+    {#if loggedIn}
+      <p>{user?.firstName}</p>
+    {:else}
+      <a href="/auth">Connexion</a>
+    {/if}
   </div>
 </div>
 

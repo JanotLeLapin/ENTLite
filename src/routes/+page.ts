@@ -2,6 +2,10 @@ import { userInfo } from '$lib/user';
 import type { PageLoad } from './$types';
 
 export const load = (async ({ fetch }) => {
-  const user = await userInfo(fetch);
-  return { user }
+  try {
+    const user = await userInfo(fetch);
+    return { user }
+  } catch (e) {
+    return { unauthorized: true };
+  }
 }) satisfies PageLoad;
