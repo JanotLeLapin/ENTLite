@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 
-
   let username = ''
   let password = ''
 
@@ -25,6 +24,10 @@
     if (k.key === 'Enter') login();
   }
 </script>
+
+<svelte:head>
+  <title>Messages • ENTLite</title>
+</svelte:head>
 
 <input type="text" bind:value={username} on:keypress={keypress} />
 <input type="password" bind:value={password} on:keypress={keypress}  />

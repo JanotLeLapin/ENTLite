@@ -5,6 +5,10 @@
   export let data: PageServerData;
 </script>
 
+<svelte:head>
+  <title>Messages • ENTLite</title>
+</svelte:head>
+
 <Header user={data.user} unread={data.unread} />
 <div class="">
   {#if data.messages}
