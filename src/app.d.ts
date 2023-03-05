@@ -8,6 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			user: UserInfo | null,
+			unread: number;
 		}
 		// interface PageData {}
 		// interface Platform {}

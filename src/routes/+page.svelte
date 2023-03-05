@@ -5,5 +5,5 @@
 	export let data: PageServerData;
 </script>
 
-<Header user={data.user} />
+<Header user={data.user} unread={data.unread} />
 <h1>Bonjour {data.user?.firstName}</h1>

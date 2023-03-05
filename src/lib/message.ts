@@ -17,4 +17,4 @@ export const fetchMessages = async (cookie: Cookies, folder?: Folder, page?: num
 
 
 export const fetchUnreadCount = async (cookie: Cookies): Promise<number> =>
-  await serverFetch(cookie, 'GET', 'https://https://ent.iledefrance.fr/zimbra/count/INBOX?unread=true').then(res => res.count);
+  await serverFetch(cookie, 'GET', 'https://ent.iledefrance.fr/zimbra/count/INBOX?unread=true').then(res => res.count);
