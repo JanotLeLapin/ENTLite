@@ -16,7 +16,9 @@
         'content-type': 'application/json',
       },
     });
-    goto('/');
+
+    if (res.status == 200)
+      goto('/');
   }
 
   const keypress = (k: KeyboardEvent) => {

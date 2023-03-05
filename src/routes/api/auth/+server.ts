@@ -17,7 +17,13 @@ export const POST = (async ({ request, fetch }) => {
     redirect: 'manual',
   });
 
-  return new Response('hey', {
+  if (res.status == 200) {
+    // 200 status code means auth failed.
+    return new Response(null, { status: 401, });
+  }
+
+  return new Response(null, {
+    status: 200,
     headers: {
       'set-cookie': res.headers.get('set-cookie'),
     } as any,
