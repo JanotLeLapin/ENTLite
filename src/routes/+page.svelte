@@ -6,4 +6,20 @@
 </script>
 
 <Header user={data.user} unread={data.unread} />
-<h1>Bonjour {data.user?.firstName}</h1>
+
+{#if data.user}
+	<div class="sm:px-24 sm:text-left py-32 text-center space-y-2">
+		<h1 class="font-bold">Bonjour {data.user.firstName}</h1>
+		<p class="text-xl">Bienvenue sur votre expérience ENT, redéfinie.</p>
+	</div>
+{:else}
+	<div class="py-32 text-center">
+	  <h1>Bienvenue</h1>
+	</div>
+{/if}
+
+<style>
+	h1 {
+		@apply text-5xl font-bold;
+	}
+</style>
