@@ -1,3 +1,6 @@
+import type { Cookies } from "@sveltejs/kit";
+import { serverFetch } from "./api";
+
 export type Message = {
   id: string,
   date: number,
@@ -9,11 +12,9 @@ export type Message = {
 
 export type Folder = 'Inbox' | 'Sent' | 'Drafts' | 'Trash' | 'Junk';
 
-export const messages = async (folder?: Folder, page?: number, unread?: boolean, fn?: typeof fetch): Promise<Message[]> => {
-  return await (fn || fetch)(`/api/message?folder=${folder || 'Inbox'}&page=${page || 0}&unread=${unread || false}`).then(res => res.json());
-}
+export const fetchMessages = async (cookie: Cookies, folder?: Folder, page?: number, unread?: boolean): Promise<Message[]> =>
+  await serverFetch(cookie, 'GET', `https://ent.iledefrance.fr/zimbra/list?folder=/${folder || 'Inbox'}&page=${page || 0}&unread=${unread || false}`);
 
-export const unreadCount = async (fn?: typeof fetch): Promise<number> => {
-  const json = await (fn || fetch)('/api/message/count').then(res => res.json());
-  return json.count;
-}
+
+export const fetchUnreadCount = async (cookie: Cookies): Promise<number> =>
+  await serverFetch(cookie, 'GET', 'https://https://ent.iledefrance.fr/zimbra/count/INBOX?unread=true').then(res => res.count);

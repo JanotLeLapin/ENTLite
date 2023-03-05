@@ -1,7 +1,9 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
+	import Header from "../components/Header.svelte";
+	import type { PageServerData } from "./$types";
 
-	export let data: PageData;
+	export let data: PageServerData;
 </script>
 
-<h1>Bonjour {data?.user?.firstName}</h1>
+<Header user={data.user} />
+<h1>Bonjour {data.user?.firstName}</h1>

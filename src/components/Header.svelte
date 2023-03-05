@@ -1,19 +1,8 @@
 <script lang="ts">
-	import { unreadCount } from '$lib/message';
 	import type { UserInfo } from '$lib/user';
-	import { onMount } from 'svelte';
 
-  export let user: UserInfo;
-
-  let loggedIn = false;
-
-  let unread = 0;
-  onMount(async () => {
-    unreadCount().then(res => {
-      unread = res;
-      loggedIn = true;
-    }).catch(console.error);
-  })
+  export let user: UserInfo | null;
+  export let unread: number = 0;
 </script>
 
 <div class="flex justify-between items-center px-32 py-4 border-b border-gray-200">
@@ -24,8 +13,8 @@
     </ul>
   </div>
   <div class="space-x-4">
-    {#if loggedIn}
-      <p>{user?.firstName} {user?.lastName}</p>
+    {#if user}
+      <p>{user.firstName} {user.lastName}</p>
     {:else}
       <a href="/auth">Connexion</a>
     {/if}
